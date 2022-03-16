@@ -40,6 +40,7 @@ class GoCart {
             labelCartIsEmpty: 'Your Cart is currently empty!',
             labelQuantity: 'Quantity:',
             labelRemove: 'Remove',
+            useDropdown: false
         };
 
         this.defaults = Object.assign({}, defaults, options);
@@ -75,6 +76,7 @@ class GoCart {
         this.labelCartIsEmpty = this.defaults.labelCartIsEmpty;
         this.labelQuantity = this.defaults.labelQuantity;
         this.labelRemove = this.defaults.labelRemove;
+        this.useDropdown = this.defaults.useDropdown;
 
         this.init();
 
@@ -258,10 +260,12 @@ class GoCart {
         if (this.isDrawerMode) {
             if (cart.item_count === 0) {
                 this.renderBlankCartDrawer();
+                this.cartDrawer.classList.add('is-empty');
                 this.cartDrawerFooter.classList.add('is-invisible');
             } else {
                 this.renderDrawerCart(cart);
                 this.cartDrawerFooter.classList.remove('is-invisible');
+                this.cartDrawer.classList.remove('is-empty');
                 if ((typeof callback) === 'function') {
                     callback(cart);
                 }
@@ -313,6 +317,20 @@ class GoCart {
             if (itemVariant === null) {
                 itemVariant = '';
             }
+
+        let quantityOptions = '';
+        
+        for(let i = 1; i <= 10; i++){
+            quantityOptions += `<option value="${i}" ${i == parseInt(item.quantity) ? 'selected' : ''}>${i}</option>`;
+        }
+        
+
+        const selectorField = `<span class="go-cart-item__quantity-button js-go-cart-quantity-minus">-</span>
+        <input class="go-cart-item__quantity-number js-go-cart-quantity" type="number" value="${item.quantity}" disabled>
+        <span class="go-cart-item__quantity-button js-go-cart-quantity-plus">+</span>`;
+
+        const quantityField = this.useDropdown ? `<select class="go-cart-item__quantity-select js-go-cart-quantity"> ${quantityOptions}</select>` : selectorField;
+
             const cartSingleProduct = `
         <div class="go-cart-item__single" data-line="${Number(index + 1)}">
             <div class="go-cart-item__info-wrapper">
@@ -320,15 +338,16 @@ class GoCart {
                 <div class="go-cart-item__info">
                     <a href="${item.url}" class="go-cart-item__title">${item.product_title}</a>
                     <div class="go-cart-item__variant">${itemVariant}</div>
-                    <div class="go-cart-item__quantity">
-                        <span class="go-cart-item__quantity-label">${this.labelQuantity} </span>
-                        <span class="go-cart-item__quantity-button js-go-cart-quantity-minus">-</span>
-                        <input class="go-cart-item__quantity-number js-go-cart-quantity" type="number" value="${item.quantity}" disabled>
-                        <span class="go-cart-item__quantity-button js-go-cart-quantity-plus">+</span>
-                    </div>
+                    <footer>
+                        <div class="go-cart-item__quantity">
+                            <span class="go-cart-item__quantity-label">${this.labelQuantity} </span>
+                            ${quantityField}
+                        </div>
+                        <div class="go-cart-item__price">${formatMoney(item.line_price, this.moneyFormat)}</div>
+                    </footer>
+                   
                 </div>
             </div>
-            <div class="go-cart-item__price">${formatMoney(item.line_price, this.moneyFormat)}</div>
             <a class="go-cart-item__remove ${this.removeFromCartNoDot}">${this.labelRemove}</a>
         </div>
       `;
@@ -344,6 +363,19 @@ class GoCart {
                 this.removeItem(line);
             });
         });
+
+        if(this.useDropdown){
+            const itemQuantity = document.querySelectorAll(this.itemQuantity);
+
+            itemQuantity.forEach((item) => {
+                item.addEventListener('change', () => {
+                    const line = item.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('data-line');
+                    const quantity = Number(item.parentNode.querySelector(this.itemQuantity).value);
+                    this.changeItemQuantity(line, quantity);
+                });
+            });
+        }
+      
         const itemQuantityPlus = document.querySelectorAll(this.itemQuantityPlus);
         itemQuantityPlus.forEach((item) => {
             item.addEventListener('click', () => {
@@ -406,7 +438,7 @@ class GoCart {
         const itemQuantityPlus = document.querySelectorAll(this.itemQuantityPlus);
         itemQuantityPlus.forEach((item) => {
             item.addEventListener('click', () => {
-                const line = item.parentNode.parentNode.parentNode.parentNode.getAttribute('data-line');
+                const line = item.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('data-line');
                 const quantity = Number(item.parentNode.querySelector(this.itemQuantity).value) + 1;
                 this.changeItemQuantity(line, quantity);
             });
@@ -414,11 +446,11 @@ class GoCart {
         const itemQuantityMinus = document.querySelectorAll(this.itemQuantityMinus);
         itemQuantityMinus.forEach((item) => {
             item.addEventListener('click', () => {
-                const line = item.parentNode.parentNode.parentNode.parentNode.getAttribute('data-line');
+                const line = item.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute('data-line');
                 const quantity = Number(item.parentNode.querySelector(this.itemQuantity).value) - 1;
                 this.changeItemQuantity(line, quantity);
                 if (Number((item.parentNode.querySelector(this.itemQuantity).value - 1)) === 0) {
-                    GoCart.removeItemAnimation(item.parentNode.parentNode.parentNode.parentNode);
+                    GoCart.removeItemAnimation(item.parentNode.parentNode.parentNode.parentNode.parentNode);
                 }
             });
         });
@@ -438,6 +470,7 @@ class GoCart {
 
     clearCartDrawer() {
         this.cartDrawerContent.innerHTML = '';
+
     }
 
     clearMiniCart() {
