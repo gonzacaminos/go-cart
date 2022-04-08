@@ -40,7 +40,9 @@ class GoCart {
             labelCartIsEmpty: 'Your Cart is currently empty!',
             labelQuantity: 'Quantity:',
             labelRemove: 'Remove',
-            useDropdown: false
+            useDropdown: false,
+            upsellsURL: false,
+            upsellsContainer: '.upsells-content'
         };
 
         this.defaults = Object.assign({}, defaults, options);
@@ -77,7 +79,8 @@ class GoCart {
         this.labelQuantity = this.defaults.labelQuantity;
         this.labelRemove = this.defaults.labelRemove;
         this.useDropdown = this.defaults.useDropdown;
-
+        this.upsellsURL = this.defaults.upsellsURL;
+        this.upsellsContainer = this.defaults.upsellsContainer;
         this.init();
 
     }
@@ -172,10 +175,29 @@ class GoCart {
         })
             .then((response) => response.json())
             .then((cart) => this.fetchHandler(cart, callback))
+            .then(cart => this.fetchUpsells())
             .catch((error) => {
                 this.ajaxRequestFail();
                 throw new Error(error);
             });
+    }
+
+    fetchUpsells() {
+        if(this.upsellsURL) {
+            window.fetch(this.upsellsURL, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'text/plain;charset=UTF-8'
+                  },
+            })
+                .then((response) => response.text())
+                .then((upsells) => this.renderUpsells(upsells))
+                .catch((error) => {
+                    this.ajaxRequestFail();
+                    throw new Error(error);
+                });
+        }
+      
     }
 
     addItemToCart(formID) {
@@ -312,6 +334,7 @@ class GoCart {
 
     renderDrawerCart(cart) {
         this.clearCartDrawer();
+      
         cart.items.forEach((item, index) => {
             let itemVariant = item.variant_title;
             if (itemVariant === null) {
@@ -353,6 +376,7 @@ class GoCart {
       `;
             this.cartDrawerContent.innerHTML += cartSingleProduct;
         });
+
         this.cartDrawerSubTotal.innerHTML = formatMoney(cart.total_price, this.moneyFormat);
         this.cartDrawerSubTotal.parentNode.classList.remove('is-invisible');
         const removeFromCart = document.querySelectorAll(this.removeFromCart);
@@ -395,6 +419,10 @@ class GoCart {
                 }
             });
         });
+    }
+
+    renderUpsells(upsells) {
+        document.querySelector('.upsells-content').innerHTML = upsells;
     }
 
     renderMiniCart(cart) {
