@@ -1,6 +1,6 @@
 /*!
  * 
- *   @dango-digital/gocart v1.0.9
+ *   @dango-digital/gocart v1.0.10
  *   
  * 
  *   Copyright (c) Bornfight (https://www.bornfight.com/)
