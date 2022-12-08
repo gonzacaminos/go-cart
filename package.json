@@ -1,7 +1,7 @@
 {
-  "name": "@dango-digital/gocart",
-  "version": "1.0.10",
-  "description": "goCart.js - Complete Shopify Ajax cart from Bornfight, tuned by Dango",
+  "name": "@lonelypixels/gocart",
+  "version": "1.1.0",
+  "description": "goCart.js - Complete Shopify Ajax cart from Bornfight, tuned by GonzaCaminos",
   "keywords": [
     "shopify",
     "ajax",
