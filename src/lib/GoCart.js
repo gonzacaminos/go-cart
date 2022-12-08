@@ -235,6 +235,13 @@ class GoCart {
                 this.ajaxRequestFail();
                 throw new Error(error);
             });
+
+        
+        const removeOnDemand = document.querySelector(`[data-line="${line}"].go-cart-item__single.regular_cart`);
+
+        if(removeOnDemand !== null) {
+            removeOnDemand.remove();
+        }
     }
 
     changeItemQuantity(line, quantity) {
@@ -375,10 +382,25 @@ class GoCart {
         </div>
       `;
             this.cartDrawerContent.innerHTML += cartSingleProduct;
+            const priceOnDemand = document.querySelector(`[data-line="${Number(index + 1)}"] .go-cart-item__price.on_demand`);
+            const quantityOnDemand = document.querySelector(`[data-line="${Number(index + 1)}"] .js-go-cart-quantity.on_demand`);
+
+            if(priceOnDemand !== null){
+                priceOnDemand.innerHTML = formatMoney(item.line_price, this.moneyFormat);
+            }
+
+            if(quantityOnDemand !== null){
+                quantityOnDemand.value = item.quantity;
+            }
+
         });
 
         this.cartDrawerSubTotal.innerHTML = formatMoney(cart.total_price, this.moneyFormat);
         this.cartDrawerSubTotal.parentNode.classList.remove('is-invisible');
+        const subtotalOnDemand = document.querySelector(`.js-go-cart-drawer-subtotal_custom.on_demand`);
+        if(subtotalOnDemand !== null){
+            subtotalOnDemand.innerHTML = formatMoney(cart.total_price, this.moneyFormat);
+        }
         const removeFromCart = document.querySelectorAll(this.removeFromCart);
         removeFromCart.forEach((item) => {
             item.addEventListener('click', () => {
@@ -388,8 +410,7 @@ class GoCart {
             });
         });
 
-        if(this.useDropdown){
-            const itemQuantity = document.querySelectorAll(this.itemQuantity);
+        const itemQuantity = document.querySelectorAll(this.itemQuantity);
 
             itemQuantity.forEach((item) => {
                 item.addEventListener('change', () => {
