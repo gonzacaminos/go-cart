@@ -42,7 +42,8 @@ class GoCart {
             labelRemove: 'Remove',
             useDropdown: false,
             upsellsURL: false,
-            upsellsContainer: '.upsells-content'
+            upsellsContainer: '.upsells-content',
+            replaceButtonText: false
         };
 
         this.defaults = Object.assign({}, defaults, options);
@@ -81,6 +82,7 @@ class GoCart {
         this.useDropdown = this.defaults.useDropdown;
         this.upsellsURL = this.defaults.upsellsURL;
         this.upsellsContainer = this.defaults.upsellsContainer;
+        this.replaceButtonText = this.defaults.replaceButtonText;
         this.init();
 
     }
@@ -107,6 +109,10 @@ class GoCart {
                 }
                 const formID = form.getAttribute('id');
                 this.addItemToCart(formID);
+                if(this.replaceButtonText){
+                    item.dataset['prev_text'] = item.innerText;
+                    item.innerText = this.replaceButtonText;
+                }                
             }
         }, false);
 
@@ -202,6 +208,7 @@ class GoCart {
 
     addItemToCart(formID) {
         const form = document.querySelector(`#${formID}`);
+        const button = form.querySelector(this.defaults.addToCart);
         const formData = serialize(form, {hash: true});
         window.fetch('/cart/add.js', {
             method: 'POST',
@@ -212,7 +219,10 @@ class GoCart {
             body: JSON.stringify(formData),
         })
             .then((response) => response.json())
-            .then((product) => this.addItemToCartHandler(product))
+            .then((product) => { 
+                this.addItemToCartHandler(product);
+                button.innerText = button.dataset.prev_text
+            })
             .catch((error) => {
                 this.ajaxRequestFail();
                 throw new Error(error);
