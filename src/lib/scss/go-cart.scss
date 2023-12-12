@@ -13,6 +13,7 @@ $go-cart-mini-cart-subtotal-height: 50px !default;
 $go-cart-mini-cart-bg: #ffffff !default;
 $go-cart-overlay-bg: rgba(0, 0, 0, 0.4) !default;
 $go-cart-transition: all .3s ease-in-out !default;
+$go-cart-transition-faster: all .1.5s ease-in-out !default;
 $go-cart-item-border: #f5f5f5 !default;
 $go-cart-quantity-number-color: #000000 !default;
 $go-cart-quantity-button-border: #f5f5f5 !default;
@@ -251,7 +252,7 @@ $go-cart-z-index-base: 0 !default;
 
     &__single {
         position: relative;
-        transition: $go-cart-transition;
+        transition: $go-cart-transition-faster;
         padding: 15px 0;
         border-bottom: 1px solid $go-cart-item-border;
     }
