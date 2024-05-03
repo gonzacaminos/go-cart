@@ -364,6 +364,7 @@ class GoCart {
             quantityOptions += `<option value="${i}" ${i == parseInt(item.quantity) ? 'selected' : ''}>${i}</option>`;
         }
         
+        const selling_plan = item?.selling_plan_allocation?.selling_plan?.name;
 
         const selectorField = `<span class="go-cart-item__quantity-button js-go-cart-quantity-minus">-</span>
         <input class="go-cart-item__quantity-number js-go-cart-quantity" type="number" value="${item.quantity}" disabled>
@@ -377,7 +378,8 @@ class GoCart {
                 <div class="go-cart-item__image" style="background-image: url(${item.image});"></div>
                 <div class="go-cart-item__info">
                     <a href="${item.url}" class="go-cart-item__title">${item.product_title}</a>
-                    <div class="go-cart-item__variant">${itemVariant}</div>
+                    <div class="go-cart-item__variant">${itemVariant} ${selling_plan ? ' | ' + selling_plan : ""}</div>
+                    <div class="go-cart-item__selling_plan"></div>
                     <footer>
                         <div class="go-cart-item__quantity">
                             <span class="go-cart-item__quantity-label">${this.labelQuantity} </span>
